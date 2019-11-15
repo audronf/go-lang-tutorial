@@ -1,11 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"fmt"
-	"go-lang-tutorial/models"
+
+	"./models"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
@@ -17,8 +18,7 @@ var err error
 
 func main() {
 	router := mux.NewRouter()
-	dbURI := fmt.Sprintf("postgres://postgres:%s@%s:5432/%s?sslmode=disable",
-						os.Getenv("db_pass"), os.Getenv("db_host"), os.Getenv("db_name"))
+	dbURI := fmt.Sprintf("postgres://dev:dev@localhost:5432/golangtutorial?sslmode=disable")
 	db, err = gorm.Open("postgres", dbURI)
 	if err != nil {
 		panic(err)
