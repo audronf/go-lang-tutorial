@@ -2,18 +2,19 @@ package models
 
 import (
 	"github.com/dgrijalva/jwt-go"
+	u "go-lang-tutorial/utils"
 	"github.com/jinzhu/gorm"
+	"os"
+	"golang.org/x/crypto/bcrypt"
 )
 
-/*
-JWT claims struct
-*/
+// Token model
 type Token struct {
-	UserId uint
+	UserID uint
 	jwt.StandardClaims
 }
 
-//a struct to rep user account
+// User model
 type User struct {
 	gorm.Model
 	Name     string `json:"name"`
@@ -21,4 +22,25 @@ type User struct {
 	Nickname string `json:"nickname"`
 	Password string `json:"password"`
 	Token    string `json:"token";sql:"-"`
+}
+
+// Create account
+func (account *User) Create() map[string]interface{} {
+
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(account.Password), bcrypt.DefaultCost)
+	account.Password = string(hashedPassword)
+	
+	db.Create(account)
+	//Create new JWT token for the newly registered account
+	tk := &Token{UserID: account.ID}
+	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
+	tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
+	account.Token = tokenString
+
+	account.Password = "" //delete password
+
+	response := u.Message(true, "Account has been created")
+	response["account"] = account
+	
+	return response
 }

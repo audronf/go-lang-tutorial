@@ -2,28 +2,32 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"github.com/gorilla/mux"
+	"go-lang-tutorial/app"
+	"go-lang-tutorial/controllers"
 	"net/http"
 	"os"
-
-	"./models"
-
-	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
-var db *gorm.DB
-var err error
-
 func main() {
+
 	router := mux.NewRouter()
-	dbURI := fmt.Sprintf("postgres://dev:dev@localhost:5432/golangtutorial?sslmode=disable")
-	db, err = gorm.Open("postgres", dbURI)
-	if err != nil {
-		panic(err)
+
+	router.HandleFunc("/api/user/new", controllers.CreateAccount).Methods("POST")
+
+	router.Use(app.JwtAuthentication) //attach JWT auth middleware
+
+	//router.NotFoundHandler = app.NotFoundHandler
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" //localhost
 	}
-	defer db.Close()
-	db.AutoMigrate(&models.User{})
-	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), router))
+
+	fmt.Println(port)
+
+	err := http.ListenAndServe(":"+port, router) //Launch the app, visit localhost:8000/api
+	if err != nil {
+		fmt.Print(err)
+	}
 }
