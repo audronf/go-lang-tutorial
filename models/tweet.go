@@ -9,14 +9,14 @@ import (
 type Tweet struct {
 	gorm.Model
 	Text    string `json:"text"`
-	User    User `json:"user"`
+	UserID    uint `json:"userId"`
 }
 
 // Create tweet
 func (tweet *Tweet) NewTweet() map[string]interface{} {
-	db.Create(tweet)
+	GetDB().Create(tweet)
 
-	response := u.Message(true, "Account has been created")
+	response := u.Message(true, "Tweet sent succesfully")
 	response["tweet"] = tweet
 	return response
 }

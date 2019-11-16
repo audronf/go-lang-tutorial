@@ -30,7 +30,7 @@ func (account *User) Create() map[string]interface{} {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(account.Password), bcrypt.DefaultCost)
 	account.Password = string(hashedPassword)
 	
-	db.Create(account)
+	GetDB().Create(account)
 	//Create new JWT token for the newly registered account
 	tk := &Token{UserID: account.ID}
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
@@ -43,4 +43,33 @@ func (account *User) Create() map[string]interface{} {
 	response["account"] = account
 	
 	return response
+}
+
+func Login(email, password string) (map[string]interface{}) {
+
+	account := &User{}
+	err := GetDB().Table("users").Where("email = ?", email).First(account).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return u.Message(false, "Email address not found")
+		}
+		return u.Message(false, "Connection error. Please retry")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(password))
+	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword { //Password does not match!
+		return u.Message(false, "Invalid login credentials. Please try again")
+	}
+	//Worked! Logged In
+	account.Password = ""
+
+	//Create JWT token
+	tk := &Token{UserID: account.ID}
+	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
+	tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
+	account.Token = tokenString //Store the token in the response
+
+	resp := u.Message(true, "Logged In")
+	resp["account"] = account
+	return resp
 }
