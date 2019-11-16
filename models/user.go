@@ -45,6 +45,7 @@ func (account *User) Create() map[string]interface{} {
 	return response
 }
 
+// Login user
 func Login(email, password string) (map[string]interface{}) {
 
 	account := &User{}

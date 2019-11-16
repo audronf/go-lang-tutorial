@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// NewTweet - Sends a new tweet if the user is logged in
 var NewTweet = func(w http.ResponseWriter, r *http.Request) {
 
 	tweet := &models.Tweet{}

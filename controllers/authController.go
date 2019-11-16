@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// CreateAccount - Creates a new account
 var CreateAccount = func(w http.ResponseWriter, r *http.Request) {
 
 	account := &models.User{}
@@ -20,6 +21,7 @@ var CreateAccount = func(w http.ResponseWriter, r *http.Request) {
 	u.Respond(w, resp)
 }
 
+// Authenticate - Login
 var Authenticate = func(w http.ResponseWriter, r *http.Request) {
 
 	account := &models.User{}
