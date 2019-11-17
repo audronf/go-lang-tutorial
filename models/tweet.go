@@ -3,6 +3,7 @@ package models
 import (
 	u "go-lang-tutorial/utils"
 	"github.com/jinzhu/gorm"
+	"reflect"
 )
 
 // Tweet struct
@@ -12,12 +13,17 @@ type Tweet struct {
 	UserID    uint `json:"userId"`
 }
 
-// NewTweet Create
+// NewTweet Create.
 func (tweet *Tweet) NewTweet() map[string] interface{ } {
-	GetDB().Create(tweet)
-
-	response := u.Message(true, "Tweet sent succesfully")
-	response["tweet"] = tweet
+	var getTweet Tweet
+	GetDB().Where("text = ? and user_id = ?", tweet.Text, tweet.UserID).First(&getTweet)
+	if (reflect.DeepEqual(getTweet, Tweet{})) {
+		GetDB().Create(tweet)
+		response := u.Message(true, "Tweet sent succesfully")
+		response["tweet"] = tweet
+		return response
+	}
+	response := u.Message(false, "Don't send duplicated tweets")
 	return response
 }
 
