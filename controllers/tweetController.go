@@ -24,6 +24,26 @@ var NewTweet = func(w http.ResponseWriter, r *http.Request) {
 	u.Respond(w, resp)
 }
 
+// UpdateTweet U
+func UpdateTweet(w http.ResponseWriter, r *http.Request) {
+	var updateTweet = &models.Tweet{}
+	u.ParseBody(r, updateTweet)
+	vars := mux.Vars(r)
+	tweetID := vars["tweetID"]
+	ID, err:= strconv.ParseUint(tweetID, 0, 0)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	tweetDetails, db:= models.GetTweet(ID)
+	if updateTweet.Text != "" {
+		tweetDetails.Text = updateTweet.Text
+	}
+	db.Save(&tweetDetails)
+	res, _ := json.Marshal(tweetDetails)
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
+}
+
 // DeleteTweet - Deletes a tweet
 var DeleteTweet = func(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -33,7 +53,6 @@ var DeleteTweet = func(w http.ResponseWriter, r *http.Request) {
 		u.Respond(w, u.Message(false, err.Error()))
 		return
 	}
-	fmt.Println(ID)
 	resp := models.DeleteTweet(ID)
 	u.Respond(w, resp)
 }

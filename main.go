@@ -17,6 +17,7 @@ func main() {
 	router.HandleFunc("/api/user/login", controllers.Authenticate).Methods("POST")
 	router.HandleFunc("/api/tweet/new", controllers.NewTweet).Methods("POST")
 	router.HandleFunc("/api/tweet/{tweetID}", controllers.DeleteTweet).Methods("DELETE")
+	router.HandleFunc("/api/tweet/{tweetID}", controllers.UpdateTweet).Methods("PUT")
 	router.Use(app.JwtAuthentication) //attach JWT auth middleware
 
 	//router.NotFoundHandler = app.NotFoundHandler
