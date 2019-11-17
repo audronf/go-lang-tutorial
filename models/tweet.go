@@ -12,11 +12,18 @@ type Tweet struct {
 	UserID    uint `json:"userId"`
 }
 
-// Create tweet
-func (tweet *Tweet) NewTweet() map[string]interface{} {
+// NewTweet Create
+func (tweet *Tweet) NewTweet() map[string] interface{ } {
 	GetDB().Create(tweet)
 
 	response := u.Message(true, "Tweet sent succesfully")
 	response["tweet"] = tweet
+	return response
+}
+
+// DeleteTweet D
+func DeleteTweet(ID uint64) map[string] interface{ } {
+	GetDB().Exec("DELETE FROM Tweets WHERE id = $1", ID)
+	response := u.Message(true, "Tweet deleted succesfully")
 	return response
 }
