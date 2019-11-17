@@ -22,15 +22,14 @@ func (tweet *Tweet) NewTweet() map[string] interface{ } {
 }
 
 // GetTweet by ID
-func GetTweet(ID uint64) (*Tweet , *gorm.DB){
+func GetTweet(ID uint64) (*Tweet){
 	var getTweet Tweet
-	db:=db.Where("ID = ?", ID).Find(&getTweet)
-	return &getTweet, db
+	GetDB().Where("ID = ?", ID).Find(&getTweet)
+	return &getTweet
 }
 
 // DeleteTweet D
 func DeleteTweet(ID uint64) map[string] interface{ } {
-	// GetDB().Exec("DELETE FROM Tweets WHERE id = $1", ID)
 	var tweet Tweet
 	GetDB().Where("id = ?", ID).Delete(tweet)
 	response := u.Message(true, "Tweet deleted succesfully")
